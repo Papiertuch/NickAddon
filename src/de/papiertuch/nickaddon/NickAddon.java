@@ -68,7 +68,6 @@ public class NickAddon extends JavaPlugin {
         }
     }
 
-
     public void updateNameTags(Player player) {
         TabListGroup playerPermissionGroup = getTabListGroup(player);
 
