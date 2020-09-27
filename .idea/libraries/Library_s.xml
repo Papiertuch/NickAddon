@@ -1,0 +1,16 @@
+<component name="libraryTable">
+  <library name="Library´s">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../../Library´s/spigot.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../../Library´s/NickAPI.jar!/" />
+      <root url="file://$PROJECT_DIR$/../../Library´s" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/../../Library´s/spigot.jar!/" />
+      <root url="file://$PROJECT_DIR$/../../Library´s" />
+    </SOURCES>
+    <jarDirectory url="file://$PROJECT_DIR$/../../Library´s" recursive="false" />
+    <jarDirectory url="file://$PROJECT_DIR$/../../Library´s" recursive="false" type="SOURCES" />
+  </library>
+</component>
