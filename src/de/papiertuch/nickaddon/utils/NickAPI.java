@@ -1,9 +1,9 @@
 package de.papiertuch.nickaddon.utils;
 
 import de.papiertuch.nickaddon.NickAddon;
-import net.haoshoku.nick.NickPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import xyz.haoshoku.nick.NickPlugin;
 
 import java.util.Random;
 import java.util.UUID;
@@ -16,12 +16,10 @@ import java.util.UUID;
 
 public class NickAPI {
 
-    private net.haoshoku.nick.api.NickAPI nickAPI;
+    private xyz.haoshoku.nick.api.NickAPI nickAPI;
 
     public NickAPI(Player player) {
         this.nickAPI = NickPlugin.getPlugin().getAPI();
-        this.nickAPI.setTabCompleteStatus(0);
-        this.nickAPI.setSkinChangingForPlayer(true);
     }
 
     public void setAutoNick(UUID uuid, boolean value) {
