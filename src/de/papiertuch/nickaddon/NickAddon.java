@@ -4,18 +4,18 @@ import de.papiertuch.nickaddon.commands.Nick;
 import de.papiertuch.nickaddon.listener.AsyncPlayerChatListener;
 import de.papiertuch.nickaddon.listener.PlayerInteractListener;
 import de.papiertuch.nickaddon.listener.PlayerJoinListener;
-import de.papiertuch.nickaddon.listener.PlayerQuitListener;
 import de.papiertuch.nickaddon.utils.MySQL;
+import de.papiertuch.nickaddon.utils.NickAddonAPI;
 import de.papiertuch.nickaddon.utils.NickConfig;
 import de.papiertuch.nickaddon.utils.TabListGroup;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scoreboard.Team;
+import xyz.haoshoku.nick.api.NickAPI;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * Created by Leon on 17.06.2019.
@@ -27,17 +27,17 @@ public class NickAddon extends JavaPlugin {
 
     private static NickAddon instance;
     private NickConfig nickConfig;
+    private NickAddonAPI api;
     private MySQL mySQL;
     private List<TabListGroup> tabListGroups;
-    private ArrayList<UUID> nickPlayers;
 
     @Override
     public void onEnable() {
         instance = this;
         nickConfig = new NickConfig();
         mySQL = new MySQL();
+        api = new NickAddonAPI();
 
-        nickPlayers = new ArrayList<>();
         tabListGroups = new ArrayList<>();
 
         nickConfig.loadConfig();
@@ -47,9 +47,7 @@ public class NickAddon extends JavaPlugin {
         }
 
 
-        if (!nickConfig.getBoolean("lobbyMode.enable")) {
-            getServer().getPluginManager().registerEvents(new PlayerQuitListener(), this);
-        } else {
+        if (nickConfig.getBoolean("lobbyMode.enable")) {
             getServer().getPluginManager().registerEvents(new PlayerInteractListener(), this);
         }
         getServer().getPluginManager().registerEvents(new PlayerJoinListener(), this);
@@ -89,10 +87,6 @@ public class NickAddon extends JavaPlugin {
         return mySQL;
     }
 
-    public ArrayList<UUID> getNickPlayers() {
-        return nickPlayers;
-    }
-
     public List<TabListGroup> getTabListGroups() {
         return tabListGroups;
     }
@@ -106,7 +100,7 @@ public class NickAddon extends JavaPlugin {
     }
 
     public TabListGroup getTabListGroup(Player player) {
-        if (!getNickPlayers().contains(player.getUniqueId())) {
+        if (!NickAPI.isNicked(player)) {
             for (TabListGroup tabListGroup : getTabListGroups()) {
                 if (player.hasPermission(tabListGroup.getPermission())) {
                     return tabListGroup;
@@ -138,5 +132,9 @@ public class NickAddon extends JavaPlugin {
         if (mySQL.isConnected()) {
             mySQL.disconnect();
         }
+    }
+
+    public NickAddonAPI getApi() {
+        return api;
     }
 }
