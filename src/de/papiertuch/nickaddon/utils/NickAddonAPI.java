@@ -43,6 +43,7 @@ public class NickAddonAPI {
             NickAPI.resetSkin(player);
             NickAPI.resetUniqueId(player);
             NickAPI.refreshPlayer(player);
+            NickAPI.resetGameProfileName(player);
             player.sendMessage(NickAddon.getInstance().getNickConfig().getString("message.unNick"));
         }
     }
@@ -87,6 +88,7 @@ public class NickAddonAPI {
             NickAPI.resetSkin(player);
             NickAPI.resetUniqueId(player);
             NickAPI.refreshPlayer(player);
+            NickAPI.resetGameProfileName(player);
             player.sendMessage(NickAddon.getInstance().getNickConfig().getString("message.unNick"));
         }
     }

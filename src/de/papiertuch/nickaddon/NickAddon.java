@@ -64,6 +64,7 @@ public class NickAddon extends JavaPlugin {
                             nickConfig.getInt(tabList + ".tagId"),
                             nickConfig.getString(tabList + ".permission")));
         }
+        NickAPI.getConfig().setGameProfileChanges(true);
     }
 
     public void updateNameTags(Player player) {
