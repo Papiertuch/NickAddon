@@ -58,10 +58,13 @@ public class NickConfig {
 
         configuration.addDefault("chat.format", "%display%%player% &8\u00BB &7%message%");
 
+
+        configuration.addDefault("tabList.useCloudNetV2", false);
         List<String> tabList = new ArrayList<>();
         tabList.add("Admin");
         tabList.add("Default");
-        configuration.addDefault("tabList", tabList);
+        configuration.addDefault("tabList.groups", tabList);
+
 
         configuration.addDefault("Admin.prefix", "&c&lAdmin &8\u258E &f");
         configuration.addDefault("Admin.suffix", "&c");

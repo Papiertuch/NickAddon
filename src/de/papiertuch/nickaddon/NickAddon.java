@@ -1,5 +1,7 @@
 package de.papiertuch.nickaddon;
 
+import de.dytanic.cloudnet.api.CloudAPI;
+import de.dytanic.cloudnet.lib.player.permission.PermissionGroup;
 import de.papiertuch.nickaddon.commands.Nick;
 import de.papiertuch.nickaddon.listener.AsyncPlayerChatListener;
 import de.papiertuch.nickaddon.listener.PlayerInteractListener;
@@ -8,6 +10,7 @@ import de.papiertuch.nickaddon.utils.MySQL;
 import de.papiertuch.nickaddon.utils.NickAddonAPI;
 import de.papiertuch.nickaddon.utils.NickConfig;
 import de.papiertuch.nickaddon.utils.TabListGroup;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -55,14 +58,27 @@ public class NickAddon extends JavaPlugin {
 
         getCommand("nick").setExecutor(new Nick());
 
-        for (String tabList : getNickConfig().getConfiguration().getStringList("tabList")) {
-            tabListGroups.add(
-                    new TabListGroup(tabList,
-                            nickConfig.getString(tabList + ".prefix"),
-                            nickConfig.getString(tabList + ".suffix"),
-                            nickConfig.getString(tabList + ".display"),
-                            nickConfig.getInt(tabList + ".tagId"),
-                            nickConfig.getString(tabList + ".permission")));
+        if (nickConfig.getBoolean("tabList.useCloudNetV2")) {
+            for (String string : CloudAPI.getInstance().getPermissionPool().getGroups().keySet()) {
+                Bukkit.broadcastMessage(string);
+                PermissionGroup permissionGroup = CloudAPI.getInstance().getPermissionGroup(string);
+                tabListGroups.add(new TabListGroup(string,
+                        permissionGroup.getPrefix(),
+                        permissionGroup.getSuffix(),
+                        permissionGroup.getDisplay(),
+                        permissionGroup.getTagId(),
+                        ""));
+            }
+        } else {
+            for (String tabList : getNickConfig().getConfiguration().getStringList("tabList")) {
+                tabListGroups.add(
+                        new TabListGroup(tabList,
+                                nickConfig.getString(tabList + ".prefix"),
+                                nickConfig.getString(tabList + ".suffix"),
+                                nickConfig.getString(tabList + ".display"),
+                                nickConfig.getInt(tabList + ".tagId"),
+                                nickConfig.getString(tabList + ".permission")));
+            }
         }
         NickAPI.getConfig().setGameProfileChanges(true);
     }
@@ -74,8 +90,7 @@ public class NickAddon extends JavaPlugin {
         for (Player all : player.getServer().getOnlinePlayers()) {
             initScoreboard(all);
             if (playerPermissionGroup != null)
-
-                    addTeamEntry(player, all, playerPermissionGroup);
+                addTeamEntry(player, all, playerPermissionGroup);
 
             TabListGroup targetPermissionGroup = getTabListGroup(all);
 
@@ -88,10 +103,6 @@ public class NickAddon extends JavaPlugin {
         return mySQL;
     }
 
-    public List<TabListGroup> getTabListGroups() {
-        return tabListGroups;
-    }
-
     public static NickAddon getInstance() {
         return instance;
     }
@@ -100,15 +111,31 @@ public class NickAddon extends JavaPlugin {
         return nickConfig;
     }
 
-    public TabListGroup getTabListGroup(Player player) {
-        if (!NickAPI.isNicked(player)) {
-            for (TabListGroup tabListGroup : getTabListGroups()) {
-                if (player.hasPermission(tabListGroup.getPermission())) {
+    public TabListGroup getDefaultGroup() {
+        if (nickConfig.getBoolean("tabList.useCloudNetV2")) {
+            for (TabListGroup tabListGroup : tabListGroups) {
+                if (tabListGroup.getName().equalsIgnoreCase(CloudAPI.getInstance().getPermissionPool().getDefaultGroup().getName())) {
                     return tabListGroup;
                 }
             }
         }
-        return getTabListGroups().get(getTabListGroups().size() - 1);
+        return tabListGroups.get(tabListGroups.size() - 1);
+    }
+
+    public TabListGroup getTabListGroup(Player player) {
+        if (!nickConfig.getBoolean("lobbyMode.enable") && !NickAPI.isNicked(player)) {
+            for (TabListGroup tabListGroup : tabListGroups) {
+                if (nickConfig.getBoolean("tabList.useCloudNetV2")) {
+                    PermissionGroup permissionGroup = CloudAPI.getInstance().getOnlinePlayer(player.getUniqueId()).getPermissionEntity().getHighestPermissionGroup(CloudAPI.getInstance().getPermissionPool());
+                    if (permissionGroup.getName().equalsIgnoreCase(tabListGroup.getName())) {
+                        return tabListGroup;
+                    }
+                } else if (player.hasPermission(tabListGroup.getPermission())) {
+                    return tabListGroup;
+                }
+            }
+        }
+        return getDefaultGroup();
     }
 
     private void addTeamEntry(Player target, Player all, TabListGroup permissionGroup) {

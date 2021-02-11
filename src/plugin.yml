@@ -1,6 +1,6 @@
 name: NickAddon
 author: Papiertuch
-version: 2.1
+version: 2.3
 main: de.papiertuch.nickaddon.NickAddon
 depend:
   - NickAPI

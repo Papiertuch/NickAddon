@@ -35,7 +35,7 @@ public class Nick implements CommandExecutor {
                 player.sendMessage(NickAddon.getInstance().getNickConfig().getString("prefix") + " §7Hier sind alle genickten Spieler");
                 for (UUID uuid : NickAPI.getNickedPlayers().keySet()) {
                     Player target = Bukkit.getPlayer(uuid);
-                    player.sendMessage(NickAddon.getInstance().getNickConfig().getString("prefix") + target.getDisplayName() + " §8» §7" + NickAPI.getPlayerOfNickedName(target.getName()));
+                    player.sendMessage(NickAddon.getInstance().getNickConfig().getString("prefix") + " " + target.getDisplayName() + " §8» §7" + NickAPI.getOriginalName(target));
                 }
             } else {
                 player.sendMessage(NickAddon.getInstance().getNickConfig().getString("prefix") + " §cEs sind keine Spieler genickt!");

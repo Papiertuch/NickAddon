@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="BedWars">
+    <CLASSES>
+      <root url="jar://D:/IdeaProjects/Jars/BedWars.jar!/" />
+      <root url="jar://D:/IdeaProjects/Jars/NickAPI-v6.0.3.jar!/" />
+      <root url="jar://D:/IdeaProjects/Jars/spigot.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://D:/IdeaProjects/Jars/spigot.jar!/" />
+    </SOURCES>
+  </library>
+</component>
