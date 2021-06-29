@@ -17,8 +17,17 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scoreboard.Team;
 import xyz.haoshoku.nick.api.NickAPI;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.net.URLConnection;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 /**
  * Created by Leon on 17.06.2019.
@@ -44,11 +53,13 @@ public class NickAddon extends JavaPlugin {
         tabListGroups = new ArrayList<>();
 
         nickConfig.loadConfig();
+
         mySQL.connect();
-        if (mySQL.isConnected()) {
-            mySQL.createTable();
+        if (!mySQL.isConnected()) {
+            return;
         }
 
+        mySQL.createTable();
 
         if (nickConfig.getBoolean("lobbyMode.enable")) {
             getServer().getPluginManager().registerEvents(new PlayerInteractListener(), this);
@@ -80,7 +91,42 @@ public class NickAddon extends JavaPlugin {
                                 nickConfig.getString(tabList + ".permission")));
             }
         }
-        NickAPI.getConfig().setGameProfileChanges(true);
+        downloadNewestNickAPI();
+    }
+
+    private void downloadNewestNickAPI() {
+        if (getServer().getPluginManager().getPlugin("NickAPI") != null) {
+            NickAPI.getConfig().setGameProfileChanges(true);
+            return;
+        }
+        String version = getNewestAPIVersion();
+        try {
+            getServer().getConsoleSender().sendMessage("§8[§cNick§8] §7Downloading version NickAPI-v" + version + ".jar");
+            URLConnection connection = new URL("https://www.papiertu.ch/plugins/nickAddon/api/latest.jar").openConnection();
+            connection.setRequestProperty("User-Agent",
+                    "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.95 Safari/537.11");
+            connection.connect();
+            try (InputStream inputStream = connection.getInputStream()) {
+                Files.copy(inputStream, Paths.get("plugins/NickAPI-v" + version + ".jar"), StandardCopyOption.REPLACE_EXISTING);
+            }
+            getServer().getConsoleSender().sendMessage("§8[§cNick§8] §aDownload was successfully");
+            getServer().getPluginManager().loadPlugin(new File("plugins/NickAPI-v" + version + ".jar"));
+            getServer().getPluginManager().enablePlugin(getServer().getPluginManager().getPlugin("NickAPI"));
+            NickAPI.getConfig().setGameProfileChanges(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public String getNewestAPIVersion() {
+        try (InputStream inputStream = new URL("https://api.spigotmc.org/legacy/update.php?resource=" + 26013).openStream(); Scanner scanner = new Scanner(inputStream)) {
+            if (scanner.hasNext()) {
+                return scanner.next();
+            }
+        } catch (IOException exception) {
+            getServer().getConsoleSender().sendMessage("§8[§cNick§8] §cNo connection to the WebServer could be established, you will not receive update notifications");
+        }
+        return "null";
     }
 
     public void updateNameTags(Player player) {
